@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import cn.com.startai.awsai.comtrade.exception.ComtradeNullException;
 import cn.com.startai.awsai.comtrade.exception.WrongFormatException;
+import cn.com.startai.awsai.comtrade.utils.ComtradeInfo;
 import cn.com.startai.awsai.comtrade.utils.ComtradeUtils;
 
 /**
@@ -17,7 +19,7 @@ public class SampRateInfo {
     public SampRateInfo() {
     }
 
-    public SampRateInfo(String line1, String line2) throws WrongFormatException {
+    public SampRateInfo(String line1, String line2) throws WrongFormatException, ComtradeNullException {
         if (!line1.equalsIgnoreCase("")) {
             nrates = Integer.parseInt(line1);
         }
@@ -36,8 +38,16 @@ public class SampRateInfo {
         bw.write(String.valueOf(nrates));
         bw.newLine();
         bw.write(String.valueOf(samp));
-        bw.write(",");
+        bw.write(ComtradeInfo.CFG_LINE_SPLIT);
         bw.write(String.valueOf(endsamp));
+    }
+
+    public String toLineStr() {
+        return String.valueOf(nrates)
+                + "\n"
+                + String.valueOf(samp)
+                + ComtradeInfo.CFG_LINE_SPLIT
+                + String.valueOf(endsamp);
     }
 
     /**

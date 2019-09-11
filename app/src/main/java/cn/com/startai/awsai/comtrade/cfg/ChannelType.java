@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import cn.com.startai.awsai.comtrade.exception.ComtradeNullException;
 import cn.com.startai.awsai.comtrade.exception.WrongFormatException;
+import cn.com.startai.awsai.comtrade.utils.ComtradeInfo;
 import cn.com.startai.awsai.comtrade.utils.ComtradeUtils;
 
 /**
@@ -17,7 +19,7 @@ public class ChannelType {
     public ChannelType() {
     }
 
-    public ChannelType(String readLine)  throws WrongFormatException {
+    public ChannelType(String readLine) throws WrongFormatException, ComtradeNullException {
         String[] split = ComtradeUtils.split(readLine);
         ComtradeUtils.checkLength(split, 3);
         if (!split[0].equalsIgnoreCase("")) {
@@ -33,10 +35,19 @@ public class ChannelType {
 
     public void write(BufferedWriter mWriter) throws IOException {
         mWriter.write(String.valueOf(TT));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(analog_channel_A));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(state_channel_D));
+    }
+
+
+    public String toLineStr() {
+        return String.valueOf(TT)
+                + ComtradeInfo.CFG_LINE_SPLIT
+                + ComtradeUtils.valueOf(analog_channel_A)
+                + ComtradeInfo.CFG_LINE_SPLIT
+                + ComtradeUtils.valueOf(state_channel_D);
     }
 
     /**

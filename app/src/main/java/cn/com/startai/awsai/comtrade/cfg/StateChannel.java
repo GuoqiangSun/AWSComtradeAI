@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import cn.com.startai.awsai.comtrade.exception.ComtradeNullException;
 import cn.com.startai.awsai.comtrade.exception.WrongFormatException;
+import cn.com.startai.awsai.comtrade.utils.ComtradeInfo;
 import cn.com.startai.awsai.comtrade.utils.ComtradeUtils;
 
 /**
@@ -19,7 +21,7 @@ public class StateChannel {
     public StateChannel() {
     }
 
-    public StateChannel(String line) throws WrongFormatException {
+    public StateChannel(String line) throws WrongFormatException, ComtradeNullException {
         String[] split = ComtradeUtils.split(line);
         ComtradeUtils.checkLength(split, 5);
         Dn = Integer.parseInt(split[0]);
@@ -32,14 +34,26 @@ public class StateChannel {
 
     public void write(BufferedWriter mWriter) throws IOException {
         mWriter.write(String.valueOf(Dn));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(ch_id));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(ph));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(ccbm));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(y));
+    }
+
+    public String toLineStr() {
+        return String.valueOf(Dn) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                ComtradeUtils.valueOf(ch_id) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                ComtradeUtils.valueOf(ph) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                ComtradeUtils.valueOf(ccbm) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                String.valueOf(y);
     }
 
     /**

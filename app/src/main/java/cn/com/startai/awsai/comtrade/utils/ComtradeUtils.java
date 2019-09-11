@@ -5,6 +5,7 @@ import android.graphics.Color;
 import java.io.File;
 
 import cn.com.startai.awsai.comtrade.cfg.AnalogChannel;
+import cn.com.startai.awsai.comtrade.exception.ComtradeNullException;
 import cn.com.startai.awsai.comtrade.exception.WrongFormatException;
 
 /**
@@ -14,9 +15,9 @@ import cn.com.startai.awsai.comtrade.exception.WrongFormatException;
  */
 public class ComtradeUtils {
 
-    public static String[] split(String line) {
+    public static String[] split(String line) throws ComtradeNullException {
         if (line == null || line.length() <= 0) {
-            throw new NullPointerException();
+            throw new ComtradeNullException();
         }
         return line.split(ComtradeInfo.CFG_LINE_SPLIT);
     }
@@ -42,7 +43,9 @@ public class ComtradeUtils {
     }
 
     public enum UI {
-        U("u"), I("i"), UN("un");
+        U("u", "v"), // 发现一种电压写法V
+        I("i"),
+        UN("un");
 
         public final String[] simpleName;
 
@@ -60,7 +63,8 @@ public class ComtradeUtils {
         }
 
         public static UI of(String channelName) {
-            if (channelName == null || channelName.equalsIgnoreCase("")) {
+            if (channelName == null
+                    || channelName.equalsIgnoreCase("")) {
                 return UI.UN;
             }
             String s = channelName.toLowerCase();
@@ -78,7 +82,7 @@ public class ComtradeUtils {
         A(Color.YELLOW, "a"), // A相
         B(Color.GREEN, "b"),// B相
         C(Color.RED, "c"),// C相
-        N(Color.BLACK, "0"),// 零线
+        N(Color.BLACK, "0"),// 零线 PS::simpleName 是数字0 不是字母o
         L(Color.RED, "l"), // 火线
         E(Color.rgb(0x9A, 0xCD, 0x32), "e"),// 地线
         U(Color.rgb(0x0F, 0x0F, 0x0F), "un"); // unknown
@@ -96,7 +100,8 @@ public class ComtradeUtils {
         }
 
         public static PL of(String channelName) {
-            if (channelName == null || channelName.equalsIgnoreCase("")) {
+            if (channelName == null
+                    || channelName.equalsIgnoreCase("")) {
                 return PL.U;
             }
             String s = channelName.toLowerCase();

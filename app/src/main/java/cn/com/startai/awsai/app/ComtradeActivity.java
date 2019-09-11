@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 
 import cn.com.startai.awsai.R;
 import cn.com.startai.awsai.app.fragment.BaseFragment;
+import cn.com.startai.awsai.app.fragment.ComtradeCfgFragment;
 import cn.com.startai.awsai.app.fragment.ComtradeFragment1;
 import cn.com.startai.awsai.app.fragment.ComtradeFragment2;
 import cn.com.startai.awsai.app.fragment.ComtradeFragment3;
@@ -56,17 +57,17 @@ public class ComtradeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comtrade);
 
-        fragments = new ArrayList<>(3);
+        fragments = new ArrayList<>(4);
+        fragments.add(ComtradeCfgFragment.newInstance());
         fragments.add(ComtradeFragment1.newInstance());
         fragments.add(ComtradeFragment2.newInstance());
         fragments.add(ComtradeFragment3.newInstance());
 
         pager = findViewById(R.id.pager);
-        pager.setOffscreenPageLimit(3);
+        pager.setOffscreenPageLimit(fragments.size() + 1);
 
         PageAdapter a = new PageAdapter(getSupportFragmentManager());
         pager.setAdapter(a);
-
 
         executorService = Executors.newSingleThreadExecutor();
 
@@ -92,7 +93,7 @@ public class ComtradeActivity extends AppCompatActivity {
             }
         });
 
-        loadData();
+        executorService.execute(loadIntData);
     }
 
     @Override
@@ -104,7 +105,6 @@ public class ComtradeActivity extends AppCompatActivity {
         }
         avaliableCfgFiles.clear();
         avaliableDatFiles.clear();
-        avaliableStr.clear();
         showFiles = null;
     }
 
@@ -112,10 +112,9 @@ public class ComtradeActivity extends AppCompatActivity {
         scanned = false;
         avaliableCfgFiles.clear();
         avaliableDatFiles.clear();
-        avaliableStr.clear();
         showFiles = null;
         lastWhich = -1;
-        Toast.makeText(getApplicationContext(), "clear success", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "clearData success", Toast.LENGTH_SHORT).show();
     }
 
     private class PageAdapter extends FragmentPagerAdapter {
@@ -126,79 +125,57 @@ public class ComtradeActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int pos) {
-            return fragments.get(pos);
+            return fragments != null ? fragments.get(pos) : null;
         }
 
         @Override
         public int getCount() {
-            return fragments.size();
+            return fragments != null ? fragments.size() : 0;
         }
     }
 
     private CfgData lastCfgData;
 
-    private void postview(CfgData tCfgData) {
+    private void runview(CfgData tCfgData) {
         lastCfgData = tCfgData;
-        fragments.get(pager.getCurrentItem()).runview(tCfgData);
+        if (fragments != null) {
+            fragments.get(pager.getCurrentItem()).runview(tCfgData);
+        }
     }
 
-    private void clear() {
+    private void clearData() {
         for (BaseFragment f : fragments) {
             f.clear();
         }
     }
 
-    private volatile boolean exe;
+    private Runnable loadIntData = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                ComtradeWorker comtradeWorker = new ComtradeWorker();
 
-    @SuppressLint("StaticFieldLeak")
-    private void loadData() {
+                InputStream open = getAssets().open("exampleComtrade.cfg");
+                BufferedReader br = new BufferedReader(new InputStreamReader(open, "UTF-8"));
+                ComtradeConfig config = comtradeWorker.getConfigWorker().read(br);
 
-        new AsyncTask<Void, Void, CfgData>() {
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                exe = true;
-            }
-
-            @Override
-            protected CfgData doInBackground(Void... voids) {
-
-                try {
-                    ComtradeWorker comtradeWorker = new ComtradeWorker();
-
-                    InputStream open = getAssets().open("exampleComtrade.cfg");
-                    BufferedReader br = new BufferedReader(new InputStreamReader(open));
-                    ComtradeConfig config = comtradeWorker.getConfigWorker().read(br);
-
-                    InputStream open1 = getAssets().open("exampleComtrade.dat");
-                    BufferedInputStream br1 = new BufferedInputStream(open1);
-                    ComtradeChannelData mChannelData = comtradeWorker.getDatWorker()
-                            .readBinaryChannelDat(config, br1);
-
-                    if (mChannelData == null) {
-                        return null;
-                    }
-                    CfgData cfgData = new CfgData(config, mChannelData);
-                    postview(cfgData);
-                    return cfgData;
-                } catch (IOException e) {
-                    e.printStackTrace();
+                InputStream open1 = getAssets().open("exampleComtrade.dat");
+                BufferedInputStream br1 = new BufferedInputStream(open1);
+                ComtradeChannelData mChannelData = comtradeWorker.getDatWorker()
+                        .readBinaryChannelDat(config, br1);
+                if (mChannelData == null) {
+                    return;
                 }
-                return null;
+                runview(new CfgData(config, mChannelData));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
-            @Override
-            protected void onPostExecute(CfgData mCfgData) {
-                super.onPostExecute(mCfgData);
-
-                exe = false;
-            }
-        }.execute();
-    }
+        }
+    };
 
     public void selectExt(View view) {
-        if (exe || exeexter) {
+        if (exeexter) {
             Toast.makeText(getApplicationContext(), "is execute,please wait retry", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -206,16 +183,15 @@ public class ComtradeActivity extends AppCompatActivity {
     }
 
     private volatile boolean scanned;
-    private String[] showFiles;
-    private ArrayList<String> avaliableStr = new ArrayList<>();
-    private ArrayList<File> avaliableCfgFiles = new ArrayList<>();
-    private ArrayList<File> avaliableDatFiles = new ArrayList<>();
+    private String[] showFiles; // 文件名数组,dialog用来展示用
+    private ArrayList<File> avaliableCfgFiles = new ArrayList<>(); // cfg 文件
+    private ArrayList<File> avaliableDatFiles = new ArrayList<>(); // dat 文件
 
     @SuppressLint("StaticFieldLeak")
     private void scanner() {
         if (scanned) {
             Tlog.v(TAG, " already scan ");
-            dialogView();
+            fileListDialogShow();
             return;
         }
 
@@ -227,17 +203,17 @@ public class ComtradeActivity extends AppCompatActivity {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
+                dialog.show();
                 scanned = false;
                 avaliableCfgFiles.clear();
                 avaliableDatFiles.clear();
-                avaliableStr.clear();
                 showFiles = null;
-                dialog.show();
             }
 
             @Override
             protected Void doInBackground(Void... voids) {
                 ArrayList<File> scanner = new ArrayList<>();
+                ArrayList<String> avaliableStr = new ArrayList<>();
                 File externalStorageDirectory = Environment.getExternalStorageDirectory();
                 FileScanner.scan(externalStorageDirectory, new String[]{".cfg", ".CFG"}, scanner);
                 Tlog.v(TAG, "scan finish size:" + scanner.size());
@@ -262,14 +238,12 @@ public class ComtradeActivity extends AppCompatActivity {
                     scanned = true;
                 }
                 dialog.dismiss();
-                dialogView();
+                fileListDialogShow();
             }
         }.execute();
     }
 
-    private volatile int lastWhich = -1;
-
-    public void dialogView() {
+    private void fileListDialogShow() {
         if (showFiles == null || showFiles.length <= 0) {
             Toast.makeText(getApplicationContext(), "No Data", Toast.LENGTH_SHORT).show();
             return;
@@ -293,6 +267,7 @@ public class ComtradeActivity extends AppCompatActivity {
     }
 
     private volatile boolean exeexter;
+    private volatile int lastWhich = -1;
 
     @SuppressLint("StaticFieldLeak")
     private void loadExterData(int which) {
@@ -302,24 +277,25 @@ public class ComtradeActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "No repetition of choices", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        executorService.execute(new ComtradeWorkerRun(which));
+        lastWhich = which;
+        File cfgFile = avaliableCfgFiles.get(which);
+        File datFile = avaliableDatFiles.get(which);
+        executorService.execute(new ComtradeWorkerRun(cfgFile, datFile));
 
     }
 
     private class ComtradeWorkerRun implements Runnable {
-        int which;
+        private File cfgFile, datFile;
 
-        private ComtradeWorkerRun(int which) {
-            this.which = which;
+        private ComtradeWorkerRun(File cfgFile, File datFile) {
+            this.cfgFile = cfgFile;
+            this.datFile = datFile;
         }
 
         @Override
         public void run() {
             exeexter = true;
             try {
-                File cfgFile = avaliableCfgFiles.get(which);
-                File datFile = avaliableDatFiles.get(which);
                 ComtradeWorker comtradeWorker = new ComtradeWorker();
                 ComtradeConfig config = comtradeWorker.getConfigWorker().read(cfgFile);
                 ComtradeChannelData mChannelData = comtradeWorker.getDatWorker()
@@ -328,20 +304,22 @@ public class ComtradeActivity extends AppCompatActivity {
                     return;
                 }
                 CfgData cfgData = new CfgData(config, mChannelData);
-                clear();
-                postview(cfgData);
-                lastWhich = which;
+                clearData();
+                runview(cfgData);
             } catch (IOException e) {
                 e.printStackTrace();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "parse data error", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                lastWhich = -1;
+                runOnUiThread(error);
             } finally {
                 exeexter = false;
             }
         }
     }
+
+    private Runnable error = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getApplicationContext(), "parse data error", Toast.LENGTH_SHORT).show();
+        }
+    };
 }

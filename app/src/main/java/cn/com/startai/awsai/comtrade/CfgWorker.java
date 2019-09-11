@@ -3,10 +3,12 @@ package cn.com.startai.awsai.comtrade;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import cn.com.startai.awsai.comtrade.cfg.AnalogChannel;
 import cn.com.startai.awsai.comtrade.cfg.ChannelType;
@@ -134,7 +136,7 @@ public class CfgWorker {
                 && !path.getPath().endsWith(ComtradeInfo.CFG_SUFFIX_UPPER)) {
             throw new WrongFormatException("path suffix must endsWith " + ComtradeInfo.CFG_SUFFIX);
         }
-        return read(new BufferedReader(new FileReader(path)));
+        return read(new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8")));
     }
 
     /**
@@ -152,7 +154,6 @@ public class CfgWorker {
             String readLine;
             int analogChannelPoint = 0;
             int stateChannelPoint = 0;
-            boolean IFReaded = false; // 已经读过IF了
 
             while ((readLine = br.readLine()) != null) {
                 if (config.mStationInfo == null) {// StationInfo
@@ -178,25 +179,26 @@ public class CfgWorker {
                         config.mStateChannels[stateChannelPoint] = new StateChannel(readLine);
                         stateChannelPoint++;
                     } else {
-                        if (!IFReaded) {  //IF
-                            if (!readLine.equalsIgnoreCase("")) {
-                                config.IF = Float.parseFloat(readLine);
-                            }
-                            IFReaded = true;
+                        if (config.IF == null) {  //IF
+                            config.IF = readLine;
                         } else {
-                            if (config.mSampRateInfo == null) {
+                            if (config.mSampRateInfo == null) {//sampRate
+                                // 再读一行, SampRateInfo 需要两行数据
                                 String readLine1 = br.readLine();
                                 config.mSampRateInfo = new SampRateInfo(readLine, readLine1);
                             } else {
-                                if (config.mTimeDates == null) {
+                                if (config.mTimeDates == null) {//timeDate
+                                    // 再读一行, TimeDate 需要两行数据
                                     String readLine1 = br.readLine();
                                     config.mTimeDates = new TimeDate(readLine, readLine1);
                                 } else {
-                                    config.ft = readLine;
-                                    String s = br.readLine();
-                                    if (s != null && !s.equalsIgnoreCase("")) {
-                                        config.timemult = Float.parseFloat(s);
-                                    }
+                                    if (config.ft == null) {//ft
+                                        config.ft = readLine;
+                                    } else {// timemult
+                                        if (!readLine.equalsIgnoreCase("")) {
+                                            config.timemult = Float.parseFloat(readLine);
+                                        }
+                                    } // //////// end
                                 }
                             }
                         }

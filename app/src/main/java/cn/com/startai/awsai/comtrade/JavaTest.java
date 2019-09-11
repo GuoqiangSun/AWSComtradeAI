@@ -2,6 +2,7 @@ package cn.com.startai.awsai.comtrade;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -33,6 +34,8 @@ public class JavaTest {
 //        readBinaryChannelDat();
 
 //        binaryAnalogDatToCsv();
+
+        strEnc();
 
         System.out.println("end");
     }
@@ -101,4 +104,53 @@ public class JavaTest {
         }
     }
 
+    private static void strEnc() {
+        String station = "1-交流电压180V 1#Ua";
+        printEncStrBytes(station);
+    }
+
+    public static void printEncStrBytes(String station) {
+
+        System.out.println(station);
+
+        byte[] bytes = station.getBytes();
+        System.out.print("getBytes::");
+        for (byte b : bytes) {
+            System.out.print(Integer.toHexString(b & 0xFF) + ",");
+        }
+        System.out.println();
+
+        try {
+            bytes = station.getBytes("UTF-8");
+            System.out.print("getBytes(UTF-8)::");
+            for (byte b : bytes) {
+                System.out.print(Integer.toHexString(b & 0xFF) + ",");
+            }
+            System.out.println();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            bytes = station.getBytes("GBK");
+            System.out.print("getBytes(GBK)::");
+            for (byte b : bytes) {
+                System.out.print(Integer.toHexString(b & 0xFF) + ",");
+            }
+            System.out.println();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            bytes = station.getBytes("ISO-8859-1");
+            System.out.print("getBytes(ISO-8859-1)::");
+            for (byte b : bytes) {
+                System.out.print(Integer.toHexString(b & 0xFF) + ",");
+            }
+            System.out.println();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
 }

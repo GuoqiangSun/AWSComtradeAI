@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
+import cn.com.startai.awsai.comtrade.JavaTest;
+import cn.com.startai.awsai.comtrade.exception.ComtradeNullException;
 import cn.com.startai.awsai.comtrade.exception.WrongFormatException;
+import cn.com.startai.awsai.comtrade.utils.ComtradeInfo;
 import cn.com.startai.awsai.comtrade.utils.ComtradeUtils;
 
 /**
@@ -20,11 +23,11 @@ public class StationInfo {
     public StationInfo() {
     }
 
-    public StationInfo(String line) throws WrongFormatException, UnsupportedEncodingException {
+    public StationInfo(String line) throws WrongFormatException, ComtradeNullException {
         String[] split = ComtradeUtils.split(line);
         ComtradeUtils.checkLength(split, 3);
-        station_name = new String(split[0].getBytes(), "UTF-8");
-        rec_dev_id = new String(split[1].getBytes(), "UTF-8");
+        station_name = split[0];
+        rec_dev_id = split[1];
         if (!split[2].equalsIgnoreCase("")) {
             rev_year = Integer.parseInt(split[2]);
         }
@@ -32,10 +35,18 @@ public class StationInfo {
 
     public void write(BufferedWriter mWriter) throws IOException {
         mWriter.write(ComtradeUtils.valueOf(station_name));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(rec_dev_id));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(rev_year));
+    }
+
+    public String toLineStr() {
+        return ComtradeUtils.valueOf(station_name)
+                + ComtradeInfo.CFG_LINE_SPLIT
+                + ComtradeUtils.valueOf(rec_dev_id)
+                + ComtradeInfo.CFG_LINE_SPLIT
+                + rev_year;
     }
 
     /**

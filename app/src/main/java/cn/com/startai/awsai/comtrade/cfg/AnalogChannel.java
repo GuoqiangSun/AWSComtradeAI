@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import cn.com.startai.awsai.comtrade.exception.ComtradeNullException;
 import cn.com.startai.awsai.comtrade.exception.WrongFormatException;
+import cn.com.startai.awsai.comtrade.utils.ComtradeInfo;
 import cn.com.startai.awsai.comtrade.utils.ComtradeUtils;
 
 /**
@@ -19,7 +21,7 @@ public class AnalogChannel {
     }
 
 
-    public AnalogChannel(String line) throws WrongFormatException {
+    public AnalogChannel(String line) throws WrongFormatException, ComtradeNullException {
         String[] split = ComtradeUtils.split(line);
         ComtradeUtils.checkLength(split, 13);
         An = Integer.parseInt(split[0]);
@@ -29,7 +31,7 @@ public class AnalogChannel {
         uu = split[4];
         a = Float.parseFloat(split[5]);
         b = Float.parseFloat(split[6]);
-        skew = Float.parseFloat(split[7]);
+        skew = split[7];
         min = Integer.parseInt(split[8]);
         max = Integer.parseInt(split[9]);
         primary = Float.parseFloat(split[10]);
@@ -39,30 +41,58 @@ public class AnalogChannel {
 
     public void write(BufferedWriter mWriter) throws IOException {
         mWriter.write(String.valueOf(An));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(ch_id));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(ph));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(ccbm));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(ComtradeUtils.valueOf(uu));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(a));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(b));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(skew));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(min));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(max));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(primary));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(secondary));
-        mWriter.write(",");
+        mWriter.write(ComtradeInfo.CFG_LINE_SPLIT);
         mWriter.write(String.valueOf(ps));
+    }
+
+    public String toLineStr() {
+        return String.valueOf(An) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                ComtradeUtils.valueOf(ch_id) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                ComtradeUtils.valueOf(ph) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                ComtradeUtils.valueOf(ccbm) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                ComtradeUtils.valueOf(uu) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                String.valueOf(a) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                String.valueOf(b) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                String.valueOf(skew) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                String.valueOf(min) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                String.valueOf(max) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                String.valueOf(primary) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                String.valueOf(secondary) +
+                ComtradeInfo.CFG_LINE_SPLIT +
+                String.valueOf(ps);
     }
 
     /**
@@ -118,7 +148,7 @@ public class AnalogChannel {
      * —从抽样周期开始后的通道时滞（μs）。
      * 非必需，实数，最小长度=1字符，最大长度 = 32字符。可以使用标准浮点表示方法[4]。
      */
-    public float skew;
+    public String skew;
 
 //   该区提供关于在一个记录的抽样周期内通道抽样之间的时差的信息。例如，在一个带
 //   A/D 转换器、无同步抽样、采样率为 1毫秒的 8通道装置内，第一个采样在由“时间标记”

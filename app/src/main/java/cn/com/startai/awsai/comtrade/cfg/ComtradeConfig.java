@@ -1,8 +1,5 @@
 package cn.com.startai.awsai.comtrade.cfg;
 
-import java.io.File;
-import java.util.Arrays;
-
 /**
  * author Guoqiang_Sun
  * date 2019/9/6
@@ -27,10 +24,8 @@ import java.util.Arrays;
  */
 public class ComtradeConfig {
 
-
     public ComtradeConfig() {
     }
-
 
     /**
      * 站名、特征和修改年份
@@ -57,7 +52,7 @@ public class ComtradeConfig {
      * 正常线路频率（Hz）（比如 50，60，33，333）。
      * 非必需，实数，最小长度=零字符，最大长度=32 字符，可以使用标准浮点表示法[4]。
      */
-    public float IF;
+    public String IF;
 
     /**
      * 采样率信息

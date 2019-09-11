@@ -7,7 +7,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import cn.com.startai.awsai.comtrade.exception.ComtradeNullException;
 import cn.com.startai.awsai.comtrade.exception.WrongFormatException;
+import cn.com.startai.awsai.comtrade.utils.ComtradeInfo;
 import cn.com.startai.awsai.comtrade.utils.ComtradeUtils;
 
 /**
@@ -43,7 +45,7 @@ public class TimeDate {
     public TimeDate() {
     }
 
-    public TimeDate(String line, String line1) throws WrongFormatException {
+    public TimeDate(String line, String line1) throws WrongFormatException, ComtradeNullException {
         String[] split = ComtradeUtils.split(line);
         ComtradeUtils.checkLength(split, 2);
 
@@ -76,6 +78,13 @@ public class TimeDate {
         bw.write(firstTime);
         bw.newLine();
         bw.write(secondTime);
+    }
+
+
+    public String toLineStr() {
+        return firstTime
+                + "\n"
+                + secondTime;
     }
 
 //    格式::dd/mm/yyyy，hh：mm：ss.ssssss

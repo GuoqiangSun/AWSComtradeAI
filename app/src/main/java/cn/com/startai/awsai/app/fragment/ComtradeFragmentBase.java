@@ -105,7 +105,9 @@ public class ComtradeFragmentBase extends BaseFragment {
         }
         runview(lastCfgData.getChannelData(), lastCfgData.getConfig());
         mLastCfgData = lastCfgData;
-        UIHandler.post(notifyDataSetChanged);
+        if (UIHandler != null) {
+            UIHandler.post(notifyDataSetChanged);
+        }
     }
 
     protected void runview(ComtradeChannelData channelData, ComtradeConfig config) {
@@ -114,7 +116,9 @@ public class ComtradeFragmentBase extends BaseFragment {
 
     public void clear() {
         lines.clear();
-        UIHandler.post(notifyDataSetChanged);
+        if (UIHandler != null) {
+            UIHandler.post(notifyDataSetChanged);
+        }
     }
 
     protected LineDataSet getData(ComtradeChannelData mChannelData, ComtradeConfig mConfig, int j, short[] shorts) {

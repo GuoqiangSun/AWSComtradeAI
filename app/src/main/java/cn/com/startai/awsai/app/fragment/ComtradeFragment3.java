@@ -26,7 +26,7 @@ public class ComtradeFragment3 extends ComtradeFragmentBase {
 
     @Override
     protected String getTitle() {
-        return "(调试)U+,A+";
+        return "(调试)U+,A+,U*A";
     }
 
     @Override
@@ -58,6 +58,9 @@ public class ComtradeFragment3 extends ComtradeFragmentBase {
             uis[j] = ComtradeUtils.UI.of(mConfig.mAnalogChannels[j].ch_id);
         }
 
+        boolean u0 = false;
+        boolean i0 = false;
+
         for (int i = 0; i < count; i++) {
 
             for (int j = 0; j < mConfig.mChannelType.analog_channel_A_count; j++) {
@@ -70,9 +73,11 @@ public class ComtradeFragment3 extends ComtradeFragmentBase {
                         switch (ui) {
                             case U:
                                 sumuo[i] += value[i];
+                                u0 = true;
                                 break;
                             case I:
                                 sumao[i] += value[i];
+                                i0 = true;
                                 break;
                             default:
                                 break;
@@ -119,15 +124,19 @@ public class ComtradeFragment3 extends ComtradeFragmentBase {
         lineDataTimes.setValueTypeface(TypefaceUtils.tfregular);
         lines.add(lineDataTimes);
 
-        LineDataSet uo = getData("UO", Color.BLACK, sumuo);
-        LineData lineDatauo = new LineData(uo);
-        lineDatauo.setValueTypeface(TypefaceUtils.tfregular);
-        lines.add(lineDatauo);
+        if (u0) {
+            LineDataSet uo = getData("UO", Color.BLACK, sumuo);
+            LineData lineDatauo = new LineData(uo);
+            lineDatauo.setValueTypeface(TypefaceUtils.tfregular);
+            lines.add(lineDatauo);
+        }
 
-        LineDataSet ao = getData("AO", Color.BLUE, sumao);
-        LineData lineDataao = new LineData(ao);
-        lineDataao.setValueTypeface(TypefaceUtils.tfregular);
-        lines.add(lineDataao);
+        if (i0) {
+            LineDataSet ao = getData("AO", Color.BLUE, sumao);
+            LineData lineDataao = new LineData(ao);
+            lineDataao.setValueTypeface(TypefaceUtils.tfregular);
+            lines.add(lineDataao);
+        }
     }
 
 }
