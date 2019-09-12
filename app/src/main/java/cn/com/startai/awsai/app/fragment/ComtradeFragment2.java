@@ -9,9 +9,9 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
 
-import cn.com.startai.awsai.comtrade.cfg.ComtradeConfig;
-import cn.com.startai.awsai.comtrade.dat.ComtradeChannelData;
-import cn.com.startai.awsai.comtrade.utils.ComtradeUtils;
+import cn.com.swain.comtrade.cfg.ComtradeConfig;
+import cn.com.swain.comtrade.dat.ComtradeChannelData;
+import cn.com.swain.comtrade.utils.ComtradeUtils;
 import cn.com.startai.awsai.typeface.TypefaceUtils;
 import cn.com.swain.baselib.display.ScreenUtils;
 
@@ -54,7 +54,7 @@ public class ComtradeFragment2 extends ComtradeFragmentBase {
             short[] value = values[i];
             LineDataSet data = getData(mChannelData, mConfig, i, value);
 
-            ComtradeUtils.UI of = ComtradeUtils.UI.of(mConfig.mAnalogChannels[i].ch_id);
+            ComtradeUtils.UI of = ComtradeUtils.UI.of(mConfig.mAnalogChannels[i].uu);
             switch (of) {
                 case U:
                     setsu.add(data);

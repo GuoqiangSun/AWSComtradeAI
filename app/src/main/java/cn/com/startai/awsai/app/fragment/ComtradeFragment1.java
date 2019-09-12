@@ -3,8 +3,8 @@ package cn.com.startai.awsai.app.fragment;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
-import cn.com.startai.awsai.comtrade.cfg.ComtradeConfig;
-import cn.com.startai.awsai.comtrade.dat.ComtradeChannelData;
+import cn.com.swain.comtrade.cfg.ComtradeConfig;
+import cn.com.swain.comtrade.dat.ComtradeChannelData;
 import cn.com.startai.awsai.typeface.TypefaceUtils;
 
 /**

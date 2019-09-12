@@ -2,7 +2,7 @@ package cn.com.startai.awsai.app.fragment;
 
 import android.support.v4.app.Fragment;
 
-import cn.com.startai.awsai.comtrade.CfgData;
+import cn.com.swain.comtrade.CfgData;
 
 /**
  * author Guoqiang_Sun

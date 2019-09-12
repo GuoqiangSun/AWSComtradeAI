@@ -16,11 +16,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import cn.com.startai.awsai.R;
-import cn.com.startai.awsai.comtrade.CfgData;
-import cn.com.startai.awsai.comtrade.cfg.AnalogChannel;
-import cn.com.startai.awsai.comtrade.cfg.ComtradeConfig;
-import cn.com.startai.awsai.comtrade.cfg.StateChannel;
-import cn.com.startai.awsai.comtrade.cfg.StationInfo;
+import cn.com.swain.comtrade.CfgData;
+import cn.com.swain.comtrade.cfg.ComtradeConfig;
 import cn.com.startai.awsai.typeface.TypefaceUtils;
 
 /**
@@ -54,7 +51,9 @@ public class ComtradeCfgFragment extends BaseFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_comtrade_cfg, container, false);
 
         TextView titleTxt = v.findViewById(R.id.title);
@@ -62,7 +61,7 @@ public class ComtradeCfgFragment extends BaseFragment {
         titleTxt.setText("配置文件");
 
         RecyclerView recycler = v.findViewById(R.id.recycler);
-        recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recycler.setLayoutManager(new LinearLayoutManager(context));
         adapter = new MyRecycler();
         recycler.setAdapter(adapter);
 
@@ -73,23 +72,7 @@ public class ComtradeCfgFragment extends BaseFragment {
     public void runview(CfgData lastCfgData) {
         data.clear();
         ComtradeConfig config = lastCfgData.getConfig();
-        data.add(config.mStationInfo.toLineStr());
-        data.add(config.mChannelType.toLineStr());
-        if (config.mAnalogChannels != null && config.mAnalogChannels.length > 0) {
-            for (AnalogChannel analogChannel : config.mAnalogChannels) {
-                data.add(analogChannel.toLineStr());
-            }
-        }
-        if (config.mStateChannels != null && config.mStateChannels.length > 0) {
-            for (StateChannel stateChannel : config.mStateChannels) {
-                data.add(stateChannel.toLineStr());
-            }
-        }
-        data.add(config.IF);
-        data.add(config.mSampRateInfo.toLineStr());
-        data.add(config.mTimeDates.toLineStr());
-        data.add(config.ft);
-        data.add(String.valueOf(config.timemult));
+        config.toArrays(data);
         if (UIHandler != null) {
             UIHandler.post(notifyDataSetChanged);
         }

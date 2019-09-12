@@ -27,10 +27,10 @@ import java.util.List;
 
 import cn.com.startai.awsai.R;
 import cn.com.startai.awsai.app.ComtradeActivity;
-import cn.com.startai.awsai.comtrade.CfgData;
-import cn.com.startai.awsai.comtrade.cfg.ComtradeConfig;
-import cn.com.startai.awsai.comtrade.dat.ComtradeChannelData;
-import cn.com.startai.awsai.comtrade.utils.ComtradeUtils;
+import cn.com.swain.comtrade.CfgData;
+import cn.com.swain.comtrade.cfg.ComtradeConfig;
+import cn.com.swain.comtrade.dat.ComtradeChannelData;
+import cn.com.swain.comtrade.utils.ComtradeUtils;
 import cn.com.startai.awsai.typeface.TypefaceUtils;
 import cn.com.swain.baselib.display.ScreenUtils;
 import cn.com.swain.baselib.log.Tlog;

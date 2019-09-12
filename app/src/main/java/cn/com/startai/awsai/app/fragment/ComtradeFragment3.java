@@ -7,9 +7,9 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
-import cn.com.startai.awsai.comtrade.cfg.ComtradeConfig;
-import cn.com.startai.awsai.comtrade.dat.ComtradeChannelData;
-import cn.com.startai.awsai.comtrade.utils.ComtradeUtils;
+import cn.com.swain.comtrade.cfg.ComtradeConfig;
+import cn.com.swain.comtrade.dat.ComtradeChannelData;
+import cn.com.swain.comtrade.utils.ComtradeUtils;
 import cn.com.startai.awsai.typeface.TypefaceUtils;
 import cn.com.swain.baselib.display.ScreenUtils;
 
@@ -54,8 +54,8 @@ public class ComtradeFragment3 extends ComtradeFragmentBase {
         ComtradeUtils.UI[] uis = new ComtradeUtils.UI[mConfig.mChannelType.analog_channel_A_count];
 
         for (int j = 0; j < mConfig.mChannelType.analog_channel_A_count; j++) {
-            pls[j] = ComtradeUtils.PL.of(mConfig.mAnalogChannels[j].ch_id);
-            uis[j] = ComtradeUtils.UI.of(mConfig.mAnalogChannels[j].ch_id);
+            pls[j] = ComtradeUtils.PL.of(mConfig.mAnalogChannels[j].ph);
+            uis[j] = ComtradeUtils.UI.of(mConfig.mAnalogChannels[j].uu);
         }
 
         boolean u0 = false;
