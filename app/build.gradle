@@ -54,7 +54,7 @@ dependencies {
 
     implementation 'com.android.support:recyclerview-v7:28.0.0'
 
-    implementation 'cn.com.swain169:baselib:3.2.33'
+    implementation 'cn.com.swain169:baselib:3.2.35'
 
     api 'com.android.support:multidex:1.0.3'
 

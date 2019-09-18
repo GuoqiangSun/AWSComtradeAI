@@ -31,7 +31,7 @@ import cn.com.swain.baselib.log.Tlog;
  */
 public class LambdaActivity extends AppCompatActivity {
 
-    private String TAG = "DigitalRecognitionActivity";
+    private String TAG = "LambdaActivity";
     private MyInterface myInterface;
     private GrayView mGrayView;
     private TextView mResultTxt;
@@ -151,6 +151,7 @@ public class LambdaActivity extends AppCompatActivity {
             }
         }.execute();
     }
+
     public void selectCSV(View view) {
         String[] cities = NumberData.getInstance().getCities();
         if (cities == null) {
@@ -187,7 +188,7 @@ public class LambdaActivity extends AppCompatActivity {
         builder.show();
     }
 
-    volatile  boolean AndroidBackendLambdaFunctionIsExe = false;
+    private volatile boolean AndroidBackendLambdaFunctionIsExe = false;
 
     @SuppressLint("StaticFieldLeak")
     private void AndroidBackendLambdaFunction(RequestClass request) {
@@ -229,6 +230,7 @@ public class LambdaActivity extends AppCompatActivity {
                     } else {
                         mResultTxt.setText("FAIL");
                     }
+                    mResultTxt.requestFocus();
                 }
                 AndroidBackendLambdaFunctionIsExe = false;
             }

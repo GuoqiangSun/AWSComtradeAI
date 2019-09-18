@@ -32,6 +32,7 @@ import cn.com.startai.awsai.app.fragment.ComtradeCfgFragment;
 import cn.com.startai.awsai.app.fragment.ComtradeFragment1;
 import cn.com.startai.awsai.app.fragment.ComtradeFragment2;
 import cn.com.startai.awsai.app.fragment.ComtradeFragment3;
+import cn.com.startai.awsai.app.fragment.RCFFragment;
 import cn.com.swain.baselib.file.FileScanner;
 import cn.com.swain.baselib.log.Tlog;
 import cn.com.swain.comtrade.CfgData;
@@ -57,11 +58,12 @@ public class ComtradeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comtrade);
 
-        fragments = new ArrayList<>(4);
+        fragments = new ArrayList<>(5);
         fragments.add(ComtradeCfgFragment.newInstance());
         fragments.add(ComtradeFragment1.newInstance());
         fragments.add(ComtradeFragment2.newInstance());
         fragments.add(ComtradeFragment3.newInstance());
+        fragments.add(RCFFragment.newInstance());
 
         pager = findViewById(R.id.pager);
         pager.setOffscreenPageLimit(fragments.size() + 1);
@@ -82,7 +84,9 @@ public class ComtradeActivity extends AppCompatActivity {
                 executorService.execute(new Runnable() {
                     @Override
                     public void run() {
-                        fragments.get(i).runview(lastCfgData);
+                        if (fragments != null) {
+                            fragments.get(i).runview(lastCfgData);
+                        }
                     }
                 });
             }
@@ -144,7 +148,11 @@ public class ComtradeActivity extends AppCompatActivity {
     }
 
     private void clearData() {
-        for (BaseFragment f : fragments) {
+        if (fragments == null) {
+            return;
+        }
+        ArrayList<BaseFragment> mFragments = this.fragments;
+        for (BaseFragment f : mFragments) {
             f.clear();
         }
     }

@@ -45,6 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
 
@@ -52,8 +53,12 @@
             android:id="@+id/resultEndpointTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:lines="2"
-            android:maxLines="2"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:clickable="true"
+            android:focusableInTouchMode="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
             android:text="N/A"
             android:textColor="@android:color/holo_red_dark"
             android:textSize="16sp" />

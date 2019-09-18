@@ -16,7 +16,7 @@ public class ImgEndpointTask extends AsyncTask<Bitmap, Void, String> {
     @Override
     protected String doInBackground(Bitmap... bitmaps) {
         byte[] compress = toCSV(compress(bitmaps[0]));
-        return EndpointTask.endpoint(compress);
+        return XgbootEndpointTask.digtalReccognitionEndpoint(compress);
     }
 
     public Bitmap getNewBitmap(Bitmap bitmap, int newWidth, int newHeight) {

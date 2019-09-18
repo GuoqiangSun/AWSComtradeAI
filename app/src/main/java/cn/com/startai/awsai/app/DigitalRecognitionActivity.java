@@ -12,7 +12,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import cn.com.startai.awsai.R;
-import cn.com.startai.awsai.task.EndpointTask;
+import cn.com.startai.awsai.task.XgbootEndpointTask;
 import cn.com.startai.awsai.utils.NumberData;
 import cn.com.startai.awsai.view.GrayView;
 import cn.com.swain.baselib.log.Tlog;
@@ -52,7 +52,7 @@ public class DigitalRecognitionActivity extends AppCompatActivity {
         }
         if (endpoint) {
             Toast.makeText(getApplicationContext(),
-                    "endpoint is running ,please retry",
+                    "digtalReccognitionEndpoint is running ,please retry",
                     Toast.LENGTH_SHORT).show();
             return;
         }
@@ -85,7 +85,7 @@ public class DigitalRecognitionActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     private void endpoint(final String s) {
 
-        new EndpointTask() {
+        new XgbootEndpointTask() {
 
             long start;
 
@@ -104,7 +104,7 @@ public class DigitalRecognitionActivity extends AppCompatActivity {
                 if (null != mResultEndpointTxt) {
                     if (aVoid != null) {
                         double ut = (System.currentTimeMillis() - start) / 1000D;
-                        mResultEndpointTxt.setText(aVoid + "(耗时" + ut + "s)");
+                        mResultEndpointTxt.setText(aVoid + " (耗时" + ut + "s)");
                     } else {
                         mResultEndpointTxt.setText("FAIL");
                     }

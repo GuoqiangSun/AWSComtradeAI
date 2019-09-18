@@ -1,8 +1,20 @@
 package cn.com.startai.awsai.app.fragment;
 
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
+import android.view.View;
+import android.widget.AdapterView;
+
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import cn.com.startai.awsai.task.RCFEndpointTask;
+import cn.com.swain.baselib.log.Tlog;
+import cn.com.swain.comtrade.CfgData;
+import cn.com.swain.comtrade.ComtradeWorker;
 import cn.com.swain.comtrade.cfg.ComtradeConfig;
 import cn.com.swain.comtrade.dat.ComtradeChannelData;
 import cn.com.startai.awsai.typeface.TypefaceUtils;
@@ -35,6 +47,5 @@ public class ComtradeFragment1 extends ComtradeFragmentBase {
             lines.add(lineData);
         }
     }
-
 
 }

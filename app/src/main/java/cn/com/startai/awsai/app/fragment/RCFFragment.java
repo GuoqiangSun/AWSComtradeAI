@@ -2,6 +2,7 @@ package cn.com.startai.awsai.app.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,31 +24,40 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.startai.awsai.R;
 import cn.com.startai.awsai.app.ComtradeActivity;
-import cn.com.swain.comtrade.CfgData;
-import cn.com.swain.comtrade.cfg.ComtradeConfig;
-import cn.com.swain.comtrade.dat.ComtradeChannelData;
-import cn.com.swain.comtrade.utils.ComtradeUtils;
+import cn.com.startai.awsai.task.RCFEndpointTask;
 import cn.com.startai.awsai.typeface.TypefaceUtils;
 import cn.com.swain.baselib.display.ScreenUtils;
 import cn.com.swain.baselib.log.Tlog;
+import cn.com.swain.comtrade.CfgData;
+import cn.com.swain.comtrade.ComtradeWorker;
+import cn.com.swain.comtrade.cfg.AnalogChannel;
+import cn.com.swain.comtrade.cfg.ComtradeConfig;
+import cn.com.swain.comtrade.dat.ComtradeChannelData;
+import cn.com.swain.comtrade.utils.ComtradeUtils;
 
 /**
  * author Guoqiang_Sun
  * date 2019/9/10
  * desc
  */
-public class ComtradeFragmentBase extends BaseFragment {
+public class RCFFragment extends BaseFragment {
 
     private ListView lstv;
     protected LineAdapter lineAdapter;
 
     private Context context;
     public static final String TAG = ComtradeActivity.TAG;
+
+    public static BaseFragment newInstance() {
+        return new RCFFragment();
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -66,10 +76,10 @@ public class ComtradeFragmentBase extends BaseFragment {
     protected float density;
 
     protected String getTitle() {
-        return "Comtrade";
+        return "RCF";
     }
 
-    protected final List<LineData> lines = new ArrayList<>();
+    protected final List<String> lines = new ArrayList<>();
 
     @Nullable
     @Override
@@ -82,11 +92,65 @@ public class ComtradeFragmentBase extends BaseFragment {
         lstv = v.findViewById(R.id.lstv);
         lineAdapter = new LineAdapter(context, lines);
         lstv.setAdapter(lineAdapter);
+        AdapterView.OnItemClickListener listener = getItemClick();
+        if (listener != null) {
+            lstv.setOnItemClickListener(listener);
+        }
         density = ScreenUtils.getDensity(context);
 
         return v;
     }
 
+    protected AdapterView.OnItemClickListener getItemClick() {
+        return new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                invokeEndpoint(mLastCfgData, position);
+            }
+        };
+    }
+
+
+    @SuppressLint("StaticFieldLeak")
+    private void invokeEndpoint(CfgData mCfgData, int position) {
+        Tlog.v(TAG, " invokeEndpoint:: " + position);
+        if (mCfgData == null) {
+            return;
+        }
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+
+                ByteArrayOutputStream byteArrayOutputStream = null;
+                try {
+                    ComtradeConfig config = mCfgData.getConfig();
+                    ComtradeChannelData channelData = mCfgData.getChannelData();
+                    ComtradeWorker worker = new ComtradeWorker();
+                    Tlog.v(TAG, " analogDatRationToCsv... ");
+                    byteArrayOutputStream = worker.analogDatRationToCsv(config, channelData, position);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Tlog.e(TAG, "analogDatRationToCsv::", e);
+                }
+
+                if (byteArrayOutputStream == null) {
+                    return null;
+                }
+
+                try {
+                    byte[] bytes = byteArrayOutputStream.toByteArray();
+                    Tlog.v(TAG, new String(bytes));
+                    String s = RCFEndpointTask.RCFEndpoint(bytes);
+                    Tlog.v(TAG, "RCFEndpoint::" + s);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Tlog.e(TAG, "RCFEndpoint::", e);
+                }
+
+                return null;
+            }
+        }.execute();
+    }
 
     protected CfgData mLastCfgData;
 
@@ -114,6 +178,12 @@ public class ComtradeFragmentBase extends BaseFragment {
 
     protected void runview(ComtradeChannelData channelData, ComtradeConfig config) {
         lines.clear();
+        AnalogChannel[] mAnalogChannels = config.mAnalogChannels;
+        int length = mAnalogChannels.length;
+        for (int i = 0; i < length; i++) {
+            AnalogChannel mAnalogChannel = mAnalogChannels[i];
+            lines.add(mAnalogChannel.An + "_" + mAnalogChannel.ch_id + "_" + mAnalogChannel.ph);
+        }
     }
 
     public void clear() {
@@ -212,16 +282,10 @@ public class ComtradeFragmentBase extends BaseFragment {
 //        chart.invalidate();
     }
 
-    protected void scaleView(LineChart chart) {
-    }
 
-    public class LineAdapter extends ArrayAdapter<LineData> {
+    public class LineAdapter extends ArrayAdapter<String> {
 
-        LineAdapter(Context context) {
-            super(context, 0);
-        }
-
-        LineAdapter(Context context, List<LineData> lst) {
+        LineAdapter(Context context, List<String> lst) {
             super(context, 0, lst);
         }
 
@@ -229,7 +293,7 @@ public class ComtradeFragmentBase extends BaseFragment {
         @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
-            LineData data = getItem(position);
+            String data = getItem(position);
 
             ViewHolder holder;
 
@@ -238,9 +302,8 @@ public class ComtradeFragmentBase extends BaseFragment {
                 holder = new ViewHolder();
 
                 convertView = LayoutInflater.from(getContext()).inflate(
-                        R.layout.list_item_linechart, null);
-                holder.chart = convertView.findViewById(R.id.chart);
-                scaleView(holder.chart);
+                        R.layout.recy_item_txt, null);
+                holder.chart = (TextView) convertView;
 
 //                // create marker to display box when values are selected
 //                MyMarkerView mv = new MyMarkerView(getContext(), R.layout.custom_marker_view);
@@ -254,16 +317,13 @@ public class ComtradeFragmentBase extends BaseFragment {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            init(holder.chart);
-            holder.chart.setData(data);
-
-            holder.chart.animateX(750);
+            holder.chart.setText(data);
 
             return convertView;
         }
 
         private class ViewHolder {
-            LineChart chart;
+            TextView chart;
         }
     }
 }
